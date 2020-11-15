@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/10/2020
---     Updated: 11/13/2020
+--     Updated: 11/15/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -283,11 +283,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, audio encode, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, audio encode, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -343,11 +343,11 @@ as $$
         else
             -- Record already exist
             -- Set message
-            set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+            result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, dynamic range, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, dynamic range, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -403,11 +403,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, resolution, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, resolution, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -465,11 +465,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, stream source, stream description, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, stream source, stream description, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -525,11 +525,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, video encode, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, video encode, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -587,11 +587,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
       end if;
 
       -- Select message
@@ -649,11 +649,11 @@ as $$
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
       end if;
 
       -- Select message
@@ -675,35 +675,51 @@ as $$
           ast.actionnumber = actionnumberstring
           group by ast.actionnumber
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update actionstatus
-            set
-            actiondescription = actiondescriptionstring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            ast.actionnumber
+            from actionstatus ast
             where
-            actionstatus.actionnumber = actionnumberstring;
+            ast.actionnumber = actionnumberstring and
+            ast.actiondescription = actiondescriptionstring
+            group by ast.actionnumber
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update actionstatus
+              set
+              actiondescription = actiondescriptionstring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              actionstatus.actionnumber = actionnumberstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, action number and action description were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, action number and action description were not provided"}';
       end if;
 
       -- Select message
@@ -725,36 +741,53 @@ as $$
           mae.audioencode = audioencodestring
           group by mae.audioencode
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update mediaaudioencode
-            set
-            movieInclude = movieincludestring,
-            tvInclude = tvincludestring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mae.audioencode
+            from mediaaudioencode mae
             where
-            mediaaudioencode.audioencode = audioencodestring;
+            mae.audioencode = audioencodestring and
+            mae.movieinclude = movieincludestring and
+            mae.tvinclude = tvincludestring
+            group by mae.audioencode
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update mediaaudioencode
+              set
+              movieInclude = movieincludestring,
+              tvInclude = tvincludestring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              mediaaudioencode.audioencode = audioencodestring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, audio encode, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, audio encode, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -776,36 +809,53 @@ as $$
           mdr.dynamicrange = dynamicrangestring
           group by mdr.dynamicrange
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update mediadynamicrange
-            set
-            movieInclude = movieincludestring,
-            tvInclude = tvincludestring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mdr.dynamicrange
+            from mediadynamicrange mdr
             where
-            mediadynamicrange.dynamicrange = dynamicrangestring;
+            mdr.dynamicrange = dynamicrange and
+            mdr.movieinclude = movieinclude and
+            mdr.tvinclude = tvinclude
+            group by mdr.dynamicrange
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update mediadynamicrange
+              set
+              movieInclude = movieincludestring,
+              tvInclude = tvincludestring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              mediadynamicrange.dynamicrange = dynamicrangestring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, dynamic range, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, dynamic range, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -827,36 +877,53 @@ as $$
           mr.resolution = resolutionstring
           group by mr.resolution
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update mediaresolution
-            set
-            movieInclude = movieincludestring,
-            tvInclude = tvincludestring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mr.resolution
+            from mediaresolution mr
             where
-            mediaresolution.resolution = resolutionstring;
+            mr.resolution = resolutionstring and
+            mr.movieinclude = movieincludestring and
+            mr.tvinclude = tvincludestring
+            group by mr.resolution
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update mediaresolution
+              set
+              movieInclude = movieincludestring,
+              tvInclude = tvincludestring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              mediaresolution.resolution = resolutionstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, resolution, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, resolution, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -878,37 +945,55 @@ as $$
           mss.streamsource = streamsourcestring
           group by mss.streamsource
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update mediastreamsource
-            set
-            streamdescription = streamdescriptionstring,
-            movieInclude = movieincludestring,
-            tvInclude = tvincludestring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mss.streamsource
+            from mediastreamsource mss
             where
-            mediastreamsource.streamsource = streamsourcestring;
+            mss.streamsource = streamsourcestring and
+            mss.streamdescription = streamdescriptionstring and
+            mss.movieinclude = movieincludestring and
+            mss.tvinclude = tvincludestring
+            group by mss.streamsource
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update mediastreamsource
+              set
+              streamdescription = streamdescriptionstring,
+              movieInclude = movieincludestring,
+              tvInclude = tvincludestring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              mediastreamsource.streamsource = streamsourcestring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, stream source, stream description, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, stream source, stream description, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -930,36 +1015,53 @@ as $$
           mve.videoencode = videoencodestring
           group by mve.videoencode
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update mediavideoencode
-            set
-            movieInclude = movieincludestring,
-            tvInclude = tvincludestring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mve.videoencode
+            from mediavideoencode mve
             where
-            mediavideoencode.videoencode = videoencodestring;
+            mve.videoencode = videoencodestring and
+            mve.movieInclude = movieincludestring and
+            mve.tvInclude = tvincludestring
+            group by mve.videoencode
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update mediavideoencode
+              set
+              movieInclude = movieincludestring,
+              tvInclude = tvincludestring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              mediavideoencode.videoencode = videoencodestring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, video encode, movie include, and tv include were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, video encode, movie include, and tv include were not provided"}';
       end if;
 
       -- Select message
@@ -981,37 +1083,55 @@ as $$
           mf.titlelong = titlelongstring
           group by mf.titlelong
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update moviefeed
-            set
-            titleshort = titleshortstring,
-            publish_date = publishdatestring,
-            actionstatus = actionstatusstring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mf.titlelong
+            from moviefeed mf
             where
-            moviefeed.titlelong = titlelongstring;
+            mf.titlelong = titlelongstring and
+            mf.titleshort = titleshortstring and
+            mf.publish_date = publishdatestring and
+            mf.actionstatus = actionstatusstring
+            group by mf.titlelong
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update moviefeed
+              set
+              titleshort = titleshortstring,
+              publish_date = publishdatestring,
+              actionstatus = actionstatusstring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              moviefeed.titlelong = titlelongstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
       end if;
 
       -- Select message
@@ -1068,16 +1188,16 @@ as $$
           else
             -- Record does not exist
             -- Set message
-            set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+            result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
           end if;
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short and title short old were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short and title short old were not provided"}';
       end if;
 
       -- Select message
@@ -1099,35 +1219,51 @@ as $$
           mf.titleshort = titleshortstring
           group by mf.titleshort
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update moviefeed
-            set
-            actionstatus = actionstatusstring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mf.titleshort
+            from moviefeed mf
             where
-            moviefeed.titleshort = titleshortstring;
+            mf.titleshort = titleshortstring and
+            mf.actionstatus = actionstatusstring
+            group by mf.titleshort
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update moviefeed
+              set
+              actionstatus = actionstatusstring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              moviefeed.titleshort = titleshortstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short and action status were not provided"}';
       end if;
 
       -- Select message
@@ -1149,37 +1285,55 @@ as $$
           tf.titlelong = titlelongstring
           group by tf.titlelong
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update tvfeed
-            set
-            titleshort = titleshortstring,
-            publish_date = publishdatestring,
-            actionstatus = actionstatusstring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            tf.titlelong
+            from tvfeed tf
             where
-            tvfeed.titlelong = titlelongstring;
+            tf.titlelong = titlelongstring and
+            tf.titleshort = titleshortstring and
+            tf.publish_date = publishdatestring and
+            tf.actionstatus = actionstatusstring
+            group by tf.titlelong
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update tvfeed
+              set
+              titleshort = titleshortstring,
+              publish_date = publishdatestring,
+              actionstatus = actionstatusstring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              tvfeed.titlelong = titlelongstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
             -- Record does not exist
             -- Set message
-            set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+            result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long, title short, publish date, and action status were not provided"}';
       end if;
 
       -- Select message
@@ -1236,16 +1390,16 @@ as $$
           else
             -- Record does not exist
             -- Set message
-            set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+            result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
           end if;
         else
           -- Record already exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) already exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) already exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short and title short old were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short and title short old were not provided"}';
       end if;
 
       -- Select message
@@ -1267,35 +1421,51 @@ as $$
           tf.titleshort = titleshortstring
           group by tf.titleshort
         ) then
-          -- Begin begin/except
-          begin
-            -- Update record
-            update tvfeed
-            set
-            actionstatus = actionstatusstring,
-            modified_date = cast(current_timestamp as timestamp)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            tf.titleshort
+            from tvfeed tf
             where
-            tvfeed.titleshort = titleshortstring;
+            tf.titleshort = titleshortstring and
+            tf.actionstatus = actionstatusstring
+            group by tf.titleshort
+          ) then
+            -- Begin begin/except
+            begin
+              -- Update record
+              update tvfeed
+              set
+              actionstatus = actionstatusstring,
+              modified_date = cast(current_timestamp as timestamp)
+              where
+              tvfeed.titleshort = titleshortstring;
 
-            -- Set message
-            result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-          exception when others then
-            -- Caught exception error
-            -- Get diagnostics information
-            get stacked diagnostics code = returned_sqlstate, msg = message_text;
+              -- Set message
+              result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
+          else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "', msg, '"}');
-          -- End begin/except
-          end;
+            result := concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short and action status were not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short and action status were not provided"}';
       end if;
 
       -- Select message
@@ -1339,11 +1509,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, action number was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, action number was not provided"}';
       end if;
 
       -- Select message
@@ -1387,11 +1557,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, audio encode was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, audio encode was not provided"}';
       end if;
 
       -- Select message
@@ -1435,11 +1605,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, dynamic range was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, dynamic range was not provided"}';
       end if;
 
       -- Select message
@@ -1483,11 +1653,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, resolution was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, resolution was not provided"}';
       end if;
 
       -- Select message
@@ -1531,11 +1701,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, stream source was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, stream source was not provided"}';
       end if;
 
       -- Select message
@@ -1579,11 +1749,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, video encode was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, video encode was not provided"}';
       end if;
 
       -- Select message
@@ -1627,11 +1797,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long was not provided"}';
       end if;
 
       -- Select message
@@ -1675,11 +1845,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short was not provided"}';
       end if;
 
       -- Select message
@@ -1723,11 +1893,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title long was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title long was not provided"}';
       end if;
 
       -- Select message
@@ -1771,11 +1941,11 @@ as $$
         else
           -- Record does not exist
           -- Set message
-          set result = '{"Status": "Success", "Message": "Record(s) does not exist"}';
+          result := '{"Status": "Success", "Message": "Record(s) does not exist"}';
         end if;
       else
         -- Set message
-        set result = '{"Status": "Error", "Message": "Process halted, title short was not provided"}';
+        result := '{"Status": "Error", "Message": "Process halted, title short was not provided"}';
       end if;
 
       -- Select message
