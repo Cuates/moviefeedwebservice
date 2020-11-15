@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/06/2020
---     Updated: 11/07/2020
+--     Updated: 11/15/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -723,30 +723,46 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           ast.actionnumber = actionnumber
           group by ast.actionnumber
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update actionstatus ast
-            set
-            ast.actiondescription = actiondescription,
-            ast.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            ast.actionnumber
+            from actionstatus ast
             where
-            ast.actionnumber = actionnumber;
+            ast.actionnumber = actionnumber and
+            ast.actiondescription = actiondescription
+            group by ast.actionnumber
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update actionstatus ast
+              set
+              ast.actiondescription = actiondescription,
+              ast.modified_date = current_timestamp(6)
+              where
+              ast.actionnumber = actionnumber;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -776,31 +792,48 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mae.audioencode = audioencode
           group by mae.audioencode
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update mediaaudioencode mae
-            set
-            mae.movieInclude = movieinclude,
-            mae.tvInclude = tvinclude,
-            mae.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mae.audioencode
+            from mediaaudioencode mae
             where
-            mae.audioencode = audioencode;
+            mae.audioencode = audioencode and
+            mae.movieinclude = movieinclude and
+            mae.tvinclude = tvinclude
+            group by mae.audioencode
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update mediaaudioencode mae
+              set
+              mae.movieInclude = movieinclude,
+              mae.tvInclude = tvinclude,
+              mae.modified_date = current_timestamp(6)
+              where
+              mae.audioencode = audioencode;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -830,31 +863,48 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mdr.dynamicrange = dynamicrange
           group by mdr.dynamicrange
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update mediadynamicrange mdr
-            set
-            mdr.movieInclude = movieinclude,
-            mdr.tvInclude = tvinclude,
-            mdr.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mdr.dynamicrange
+            from mediadynamicrange mdr
             where
-            mdr.dynamicrange = dynamicrange;
+            mdr.dynamicrange = dynamicrange and
+            mdr.movieinclude = movieinclude and
+            mdr.tvinclude = tvinclude
+            group by mdr.dynamicrange
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update mediadynamicrange mdr
+              set
+              mdr.movieInclude = movieinclude,
+              mdr.tvInclude = tvinclude,
+              mdr.modified_date = current_timestamp(6)
+              where
+              mdr.dynamicrange = dynamicrange;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -884,31 +934,48 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mr.resolution = resolution
           group by mr.resolution
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update mediaresolution mr
-            set
-            mr.movieInclude = movieinclude,
-            mr.tvInclude = tvinclude,
-            mr.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mr.resolution
+            from mediaresolution mr
             where
-            mr.resolution = resolution;
+            mr.resolution = resolution and
+            mr.movieinclude = movieinclude and
+            mr.tvinclude = tvinclude
+            group by mr.resolution
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update mediaresolution mr
+              set
+              mr.movieInclude = movieinclude,
+              mr.tvInclude = tvinclude,
+              mr.modified_date = current_timestamp(6)
+              where
+              mr.resolution = resolution;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -938,32 +1005,50 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mss.streamsource = streamsource
           group by mss.streamsource
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update mediastreamsource mss
-            set
-            mss.streamdescription = streamdescription,
-            mss.movieInclude = movieinclude,
-            mss.tvInclude = tvinclude,
-            mss.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mss.streamsource
+            from mediastreamsource mss
             where
-            mss.streamsource = streamsource;
+            mss.streamsource = streamsource and
+            mss.streamdescription = streamdescription and
+            mss.movieinclude = movieinclude and
+            mss.tvinclude = tvinclude
+            group by mss.streamsource
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update mediastreamsource mss
+              set
+              mss.streamdescription = streamdescription,
+              mss.movieInclude = movieinclude,
+              mss.tvInclude = tvinclude,
+              mss.modified_date = current_timestamp(6)
+              where
+              mss.streamsource = streamsource;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -993,31 +1078,48 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mve.videoencode = videoencode
           group by mve.videoencode
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update mediavideoencode mve
-            set
-            mve.movieInclude = movieinclude,
-            mve.tvInclude = tvinclude,
-            mve.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mve.videoencode
+            from mediavideoencode mve
             where
-            mve.videoencode = videoencode;
+            mve.videoencode = videoencode and
+            mve.movieInclude = movieincludea and
+            mve.tvInclude = tvinclude
+            group by mve.videoencode
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update mediavideoencode mve
+              set
+              mve.movieInclude = movieinclude,
+              mve.tvInclude = tvinclude,
+              mve.modified_date = current_timestamp(6)
+              where
+              mve.videoencode = videoencode;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -1047,32 +1149,50 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           mf.titlelong = titlelong
           group by mf.titlelong
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update moviefeed mf
-            set
-            mf.titleshort = titleshort,
-            mf.publish_date = publishdate,
-            mf.actionstatus = actionstatus,
-            mf.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            mf.titlelong
+            from moviefeed mf
             where
-            mf.titlelong = titlelong;
+            mf.titlelong = titlelong and
+            mf.titleshort = titleshort and
+            mf.publish_date = publishdate and
+            mf.actionstatus = actionstatus
+            group by mf.titlelong
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update moviefeed mf
+              set
+              mf.titleshort = titleshort,
+              mf.publish_date = publishdate,
+              mf.actionstatus = actionstatus,
+              mf.modified_date = current_timestamp(6)
+              where
+              mf.titlelong = titlelong;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
           -- Record does not exist
           -- Set message
@@ -1224,32 +1344,50 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in actionnumb
           tf.titlelong = titlelong
           group by tf.titlelong
         ) then
-          -- Start the tranaction
-          start transaction;
-            -- Update record
-            update tvfeed tf
-            set
-            tf.titleshort = titleshort,
-            tf.publish_date = publishdate,
-            tf.actionstatus = actionstatus,
-            tf.modified_date = current_timestamp(6)
+          -- Check if record does not exists
+          if not exists
+          (
+            -- Select records
+            select
+            tf.titlelong
+            from tvfeed tf
             where
-            tf.titlelong = titlelong;
+            tf.titlelong = titlelong and
+            tf.titleshort = titleshort and
+            tf.publish_date = publishdate and
+            tf.actionstatus = actionstatus
+            group by tf.titlelong
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Update record
+              update tvfeed tf
+              set
+              tf.titleshort = titleshort,
+              tf.publish_date = publishdate,
+              tf.actionstatus = actionstatus,
+              tf.modified_date = current_timestamp(6)
+              where
+              tf.titlelong = titlelong;
 
-            -- Check whether the update was successful
-            if code = successcode then
-              -- Commit transactional statement
-              commit;
+              -- Check whether the update was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-              -- Set message
-              set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
-            else
-              -- Rollback to the previous state before the transaction was called
-              rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) updated"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
+          else
+            -- Set message
+            set result = concat('{"Status": "Success", "Message": "Record already exists"}');
+          end if;
         else
             -- Record does not exist
             -- Set message
