@@ -15,6 +15,8 @@
 ### Prerequisite Python Modules
 * List installed modules
   * `pip3.9 list`
+* Module version
+  * `pip3.9 show <modulename>`
 * MSSQL
   * `pip3.9 install pyodbc`
     * [PyODBC](https://pypi.org/project/pyodbc/)
