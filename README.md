@@ -56,4 +56,4 @@
   * `pip3.9 install -r /path/to/requirements.txt`
 
 ### Gunicorn Manual Execution
-* /path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app
+* `/path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app`
