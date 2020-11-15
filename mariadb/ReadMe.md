@@ -9,14 +9,14 @@
 * This project was written with MariaDB 10 methods
 
 ### Stored Procedure Usage
-* `call extractmediafeed ('extractActionStatus', 'actionNumberValue', 'actionDescription', '', '', '', '', '', '', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMediaAudioEncode', '', '', 'audioEncodeValue', '', '', '', '', '', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMediaDynamicRange', '', '', '', 'dynamicRangeValue', '', '', '', '', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMediaResolution', '', '', '', '', 'resolutionValue', '', '', '', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMediaStreamSource', '', '', '', '', '', 'streamSourceValue', 'streamDescriptionValue', '', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMediaVideoEncode', '', '', '', '', '', '', '', 'videoEncodeValue', '', '', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractMovieFeed', '', '', '', '', '', '', '', '', 'titleLongValue', 'titleShortValue', 'actionStatusValue', '', 'limit', 'sort')`
-* `call extractmediafeed ('extractTVFeed', '', '', '', '', '', '', '', '', 'titleLongValue', 'titleShortValue', 'actionStatusValue', '', 'limit', 'sort')`
+* `call extractmediafeed ('extractActionStatus', 'actionNumberValue', 'actionDescription', '', '', '', '', '', '', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMediaAudioEncode', '', '', 'audioEncodeValue', '', '', '', '', '', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMediaDynamicRange', '', '', '', 'dynamicRangeValue', '', '', '', '', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMediaResolution', '', '', '', '', 'resolutionValue', '', '', '', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMediaStreamSource', '', '', '', '', '', 'streamSourceValue', 'streamDescriptionValue', '', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMediaVideoEncode', '', '', '', '', '', '', '', 'videoEncodeValue', '', '', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractMovieFeed', '', '', '', '', '', '', '', '', 'titleLongValue', 'titleShortValue', 'actionStatusValue', '', 'limitValue', 'sortValue')`
+* `call extractmediafeed ('extractTVFeed', '', '', '', '', '', '', '', '', 'titleLongValue', 'titleShortValue', 'actionStatusValue', '', 'limitValue', 'sortValue')`
 * `call insertupdatedeletemediafeed ('deleteActionStatus', 'actionNumberValue', '', '', '', '', '', '', '', '', '', '', '', '', '', '')`
 * `call insertupdatedeletemediafeed ('deleteMediaAudioEncode', '', '', 'audioEncodeValue', '', '', '', '', '', '', '', '', '', '', '', '')`
 * `call insertupdatedeletemediafeed ('deleteMediaDynamicRange', '', '', '', 'dynamicRangeValue', '', '', '', '', '', '', '', '', '', '', '')`
