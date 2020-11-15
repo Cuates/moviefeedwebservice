@@ -1,7 +1,7 @@
 ##
 #        File: moviefeedclass.py
 #     Created: 11/10/2020
-#     Updated: 11/14/2020
+#     Updated: 11/15/2020
 #  Programmer: Cuates
 #  Updated By: Cuates
 #     Purpose: Movie feed web service
@@ -56,12 +56,12 @@ class MovieFeedClass(Resource):
             # Check if status is success
             if payloadResponse['Status'] == 'Success':
               # Initialize list
-              possibleParams = ['titlelong', 'titleshort', 'actionnumber', 'limit', 'sort']
+              possibleParams = ['titlelong', 'titleshort', 'actionstatus', 'limit', 'sort']
 
               # Extract movie feed
               #resultDict = mfwsclass._extractMovieFeed('MariaDBSQLMovie', 'extracting', 'extractmediafeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
               #resultDict = mfwsclass._extractMovieFeed('PGSQLMovie', 'extracting', 'extractmediafeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._extractMovieFeed('MSSQLLMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._extractMovieFeed('MSSQLLMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
               resultDict = mfwsclass._extractMovieFeed('MSSQLWMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
 
               # Check if there is data
@@ -160,7 +160,7 @@ class MovieFeedClass(Resource):
               # Insert movie feed
               #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
               #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
               resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
 
               # Loop through sub elements
@@ -246,10 +246,10 @@ class MovieFeedClass(Resource):
               possibleParams = ['titlelong', 'titleshort', 'publishdate', 'actionstatus']
 
               # Update movie feed
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeed', possibleParams, possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeed', possibleParams, possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeed', possibleParams, possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeed', possibleParams, possibleParams, payloadResponse['Result'])
+              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeed', possibleParams, payloadResponse['Result'])
+              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeed', possibleParams, payloadResponse['Result'])
 
               # Loop through sub elements
               for systemEntries in resultDict:
@@ -336,7 +336,7 @@ class MovieFeedClass(Resource):
               # Delete movie feed
               #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeed', possibleParams, payloadResponse['Result'])
               #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeed', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeed', possibleParams, payloadResponse['Result'])
               resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'deleting', 'dbo.insertupdatedeleteMediaFeed', 'deleteMovieFeed', possibleParams, payloadResponse['Result'])
 
               # Loop through sub elements
