@@ -27,9 +27,9 @@
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMediaResolution', @resolution = 'resolutionValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMediaStreamSource', @streamsource = 'streamSourceValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMediaVideoEncode', @videoencode = 'videoEncode'`
-* `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMovieFeedTitleLong', @titlelong = 'titleLongValue'`
+* `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMovieFeed', @titlelong = 'titleLongValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteMovieFeedTitleShort', @titleshort = 'titleShortValue'`
-* `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteTVFeedTitleLong', @titlelong = 'titleLongValue'`
+* `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteTVFeed', @titlelong = 'titleLongValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'deleteTVFeedTitleShort', @titleshort = 'titleShortValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'insertActionStatus', @actionnumber = 'actionNumberValue', @actiondescription = 'actionDescriptionValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'insertMediaAudioEncode', @audioencode = 'audioEncodeValue', @movieinclude = 'movieIncludeValue', @tvinclude = 'tvIncludeValue'`
