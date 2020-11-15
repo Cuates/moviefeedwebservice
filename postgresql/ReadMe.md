@@ -1,4 +1,4 @@
-# MariaDB Function, Index, Stored Procedure, Table, and or View
+# PostgreSQL Function, Index, Stored Procedure, Table, and or View
 > PostgreSQL database schema for this project
 
 ## Table of Contents
