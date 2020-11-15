@@ -51,9 +51,3 @@
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'updateTVFeed', @titlelong = 'titleLongValue', @titleshort = 'titleShortValue', @publishdate = 'publishDateValue', @actionstatus = 'actionStatusValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'updateTVFeedTitleShort', @titleshort = 'titleShortValue', @titleshortold = 'titleShortOldValue'`
 * `exec dbo.insertupdatedeleteMediaFeed @optionMode = 'updateTVFeedTitleShortActionStatus', @titleshort = 'titleShortValue', @actionstatus = 'actionStatusValue'`
-
-
-* `exec dbo.extractNewsFeed @optionMode = 'extractNewsFeed', @title = 'titleValue', @imageurl = 'imageUrlValue', @feedurl = 'feedUrlValue', @actualurl = 'actualUrlValue', @limit = '25', @sort = 'desc'`
-* `exec dbo.insertupdatedeleteNewsFeed @optionMode = 'deleteNewsFeed', @title = 'titleValue'`
-* `exec dbo.insertupdatedeleteNewsFeed @optionMode = 'insertNewsFeed', @title = 'titleValue', @imageurl = 'imageUrlValue', @feedurl = 'feedUrlValue', @acutalurl = 'actualUrlValue', @publishdate = 'publishDateValue'`
-* `exec dbo.insertupdatedeleteNewsFeed @optionMode = 'updateNewsFeed', @title = 'titleValue', @imageurl = 'imageUrlValue', @feedurl = 'feedUrlValue', @acutalurl = 'actualUrlValue', @publishdate = 'publishDateValue'`
