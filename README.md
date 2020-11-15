@@ -5,6 +5,7 @@
 * [Version](#version)
 * [Important Note](#important-note)
 * [Prerequisite Python Modules](#prerequisite-python-modules)
+* [Gunicorn Manual Execution](#gunicorn-manual-execution)
 
 ### Version
 * 0.0.1
@@ -53,3 +54,6 @@
     * [SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
 * Install module in batch instead of Individual Installation
   * `pip3.9 install -r /path/to/requirements.txt`
+
+### Gunicorn Manual Execution
+* /path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app
