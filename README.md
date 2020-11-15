@@ -5,7 +5,6 @@
 * [Version](#version)
 * [Important Note](#important-note)
 * [Prerequisite Python Modules](#prerequisite-python-modules)
-* [Dependent MSSQL Function](#dependent-mssql-function)
 
 ### Version
 * 0.0.1
