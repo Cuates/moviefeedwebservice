@@ -59,6 +59,8 @@
     * [SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
 * Install module in batch instead of Individual Installation
   * `pip3.9 install -r /path/to/requirements.txt`
+* Upgrade module in batch instead of Individual Upgrades
+  * `pip3.9 install --upgrade -r /path/to/requirements.txt`
 
 ### Gunicorn Manual Execution
 * `/path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app`
