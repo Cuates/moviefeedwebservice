@@ -18,6 +18,11 @@
   * `pip3.9 list`
 * Module version
   * `pip3.9 show <modulename>`
+* Module Outdated
+  * `pip3.9 list --outdated`
+* Module Upgrade
+  * `pip3.9 install --upgrade <modulename>`
+  * `pip3.9 install --upgrade <modulename> <modulename> <modulename>`
 * MSSQL
   * `pip3.9 install pyodbc`
     * [PyODBC](https://pypi.org/project/pyodbc/)
