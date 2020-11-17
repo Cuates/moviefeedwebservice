@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/10/2020
---     Updated: 11/16/2020
+--     Updated: 11/17/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -26,7 +26,7 @@ as $$
   declare maxLengthTitleLong int := 255;
   declare maxLengthTitleShort int := 255;
   declare maxLengthPublishDate int := 255;
-  declare maxLengthActionNumber int := 255;
+  declare maxLengthActionStatus int := 255;
   declare titlelongstring text := titlelong;
   declare titleshortstring text := titleshort;
   declare titleshortoldstring text := titleshortold;
@@ -121,10 +121,10 @@ as $$
     -- Check if parameter is not null
     if actionstatusstring is not null then
       -- Omit characters, multi space to single space, and trim leading and trailing spaces
-      actionstatusstring := regexp_replace(regexp_replace(actionstatusstring, omitActionNumber, ' '), '[ ]{2,}', ' ');
+      actionstatusstring := regexp_replace(regexp_replace(actionstatusstring, omitActionStatus, ' '), '[ ]{2,}', ' ');
 
       -- Set character limit
-      actionstatusstring := trim(substring(actionstatusstring, 1, maxLengthActionNumber));
+      actionstatusstring := trim(substring(actionstatusstring, 1, maxLengthActionStatus));
 
       -- Check if empty string
       if actionstatusstring = '' then
@@ -163,7 +163,7 @@ as $$
               left join mediastreamsource mss on mss.movieInclude in ('1') and titlelongstring ilike concat('%', mss.streamsource, '%')
               join mediavideoencode mve on mve.movieInclude in ('1') and titlelongstring ilike concat('%', mve.videoencode, '%')
               where
-              ast.actionnumber = actionstatusstring
+              ast.actionnumber = cast(actionstatusstring as int)
             ) then
               -- Begin begin/except
               begin
@@ -182,7 +182,7 @@ as $$
                   titlelongstring,
                   titleshortstring,
                   to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
-                  actionstatusstring,
+                  cast(actionstatusstring as int),
                   cast(current_timestamp as timestamp),
                   cast(current_timestamp as timestamp)
                 );
@@ -200,7 +200,7 @@ as $$
               end;
             else
                 -- Set message
-                result := concat('{"Status": "Error", "Message": "Title long does not follow the allowed values"}');
+                result := concat('{"Status": "Error", "Message": "Title long and action status does not follow the allowed values"}');
               end if;
           else
             -- Set message
@@ -235,63 +235,57 @@ as $$
           tf.titlelong = titlelongstring
           group by tf.titlelong
         ) then
-          -- Check if year string is greater than 5 and string is a valid year
-          if length(titleshortstring) > 5 and to_timestamp(substring(titleshortstring, length(titleshortstring) - 3, length(titleshortstring)), 'YYYY') is not null then
-            -- Check if record exists
-            if exists
-            (
-              -- Select record
-              select
-              titlelongstring as titlelong
-              from actionstatus ast
-              join mediaaudioencode mae on mae.movieInclude in ('1') and titlelongstring ilike concat('%', mae.audioencode, '%')
-              left join mediadynamicrange mdr on mdr.movieInclude in ('1') and titlelongstring ilike concat('%', mdr.dynamicrange, '%')
-              join mediaresolution mr on mr.movieInclude in ('1') and titlelongstring ilike concat('%', mr.resolution, '%')
-              left join mediastreamsource mss on mss.movieInclude in ('1') and titlelongstring ilike concat('%', mss.streamsource, '%')
-              join mediavideoencode mve on mve.movieInclude in ('1') and titlelongstring ilike concat('%', mve.videoencode, '%')
-              where
-              ast.actionnumber = actionstatusstring
-            ) then
-              -- Begin begin/except
-              begin
-                -- Insert record
-                insert into tvfeed
-                (
-                  titlelong,
-                  titleshort,
-                  publish_date,
-                  actionstatus,
-                  created_date,
-                  modified_date
-                )
-                values
-                (
-                  titlelongstring,
-                  titleshortstring,
-                  to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
-                  actionstatusstring,
-                  cast(current_timestamp as timestamp),
-                  cast(current_timestamp as timestamp)
-                );
+          -- Check if record exists
+          if exists
+          (
+            -- Select record
+            select
+            titlelongstring as titlelong
+            from actionstatus ast
+            join mediaaudioencode mae on mae.tvInclude in ('1') and titlelongstring ilike concat('%', mae.audioencode, '%')
+            left join mediadynamicrange mdr on mdr.tvInclude in ('1') and titlelongstring ilike concat('%', mdr.dynamicrange, '%')
+            join mediaresolution mr on mr.tvInclude in ('1') and titlelongstring ilike concat('%', mr.resolution, '%')
+            left join mediastreamsource mss on mss.tvInclude in ('1') and titlelongstring ilike concat('%', mss.streamsource, '%')
+            join mediavideoencode mve on mve.tvInclude in ('1') and titlelongstring ilike concat('%', mve.videoencode, '%')
+            where
+            ast.actionnumber = cast(actionstatusstring as int)
+          ) then
+            -- Begin begin/except
+            begin
+              -- Insert record
+              insert into tvfeed
+              (
+                titlelong,
+                titleshort,
+                publish_date,
+                actionstatus,
+                created_date,
+                modified_date
+              )
+              values
+              (
+                titlelongstring,
+                titleshortstring,
+                to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
+                cast(actionstatusstring as int),
+                cast(current_timestamp as timestamp),
+                cast(current_timestamp as timestamp)
+              );
 
-                -- Set message
-                result := concat('{"Status": "Success", "Message": "Record(s) inserted"}');
-              exception when others then
-                -- Caught exception error
-                -- Get diagnostics information
-                get stacked diagnostics code = returned_sqlstate, msg = message_text;
-
-                -- Set message
-                result := concat('{"Status": "Error", "Message": "', msg, '"}');
-              -- End begin/except
-              end;
-            else
               -- Set message
-              result := concat('{"Status": "Error", "Message": "Title long does not follow the allowed values"}');
-            end if;
+              result := concat('{"Status": "Success", "Message": "Record(s) inserted"}');
+            exception when others then
+              -- Caught exception error
+              -- Get diagnostics information
+              get stacked diagnostics code = returned_sqlstate, msg = message_text;
+
+              -- Set message
+              result := concat('{"Status": "Error", "Message": "', msg, '"}');
+            -- End begin/except
+            end;
           else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "Title short does not follow the allowed value"}');
+            result := concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
           end if;
         else
           -- Record already exist
@@ -324,16 +318,20 @@ as $$
         ) then
           -- Check if year string is greater than 5 and string is a valid year
           if length(titleshortstring) > 5 and to_date(substring(titleshortstring, length(titleshortstring) - 3, length(titleshortstring)), 'YYYY') is not null then
-            -- Check if record exist
+            -- Check if record exists
             if exists
             (
               -- Select record
               select
-              ast.actionnumber as actionnumber
+              titlelongstring as titlelong
               from actionstatus ast
+              join mediaaudioencode mae on mae.movieInclude in ('1') and titlelongstring ilike concat('%', mae.audioencode, '%')
+              left join mediadynamicrange mdr on mdr.movieInclude in ('1') and titlelongstring ilike concat('%', mdr.dynamicrange, '%')
+              join mediaresolution mr on mr.movieInclude in ('1') and titlelongstring ilike concat('%', mr.resolution, '%')
+              left join mediastreamsource mss on mss.movieInclude in ('1') and titlelongstring ilike concat('%', mss.streamsource, '%')
+              join mediavideoencode mve on mve.movieInclude in ('1') and titlelongstring ilike concat('%', mve.videoencode, '%')
               where
-              ast.actionnumber = actionstatus
-              group by ast.actionnumber
+              ast.actionnumber = cast(actionstatusstring as int)
             ) then
               -- Check if record does not exists
               if not exists
@@ -345,8 +343,8 @@ as $$
                 where
                 mf.titlelong = titlelongstring and
                 mf.titleshort = titleshortstring and
-                mf.publish_date = publishdatestring and
-                mf.actionstatus = actionstatusstring
+                mf.publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US') and
+                mf.actionstatus = cast(actionstatusstring as int)
                 group by mf.titlelong
               ) then
                 -- Begin begin/except
@@ -356,7 +354,7 @@ as $$
                   set
                   titleshort = titleshortstring,
                   publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
-                  actionstatus = actionstatusstring,
+                  actionstatus = cast(actionstatusstring as int),
                   modified_date = cast(current_timestamp as timestamp)
                   where
                   moviefeed.titlelong = titlelongstring;
@@ -378,7 +376,7 @@ as $$
               end if;
             else
               -- Set message
-              result := concat('{"Status": "Error", "Message": "Action status value is invalid"}');
+              result := concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
             end if;
           else
             -- Set message
@@ -434,7 +432,7 @@ as $$
                 titleshort = titleshortstring,
                 modified_date = cast(current_timestamp as timestamp)
                 where
-                moviefeed.titlelong = titleshortoldstring;
+                moviefeed.titleshort = titleshortoldstring;
 
                 -- Set message
                 result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
@@ -485,57 +483,63 @@ as $$
           mf.titleshort = titleshortstring
           group by mf.titleshort
         ) then
-          -- Check if record exist
-          if exists
-          (
-            -- Select record
-            select
-            ast.actionnumber as actionnumber
-            from actionstatus ast
-            where
-            ast.actionnumber = actionstatus
-            group by ast.actionnumber
-          ) then
-            -- Check if record does not exists
-            if not exists
+          -- Check if year string is greater than 5 and string is a valid year
+          if length(titleshortstring) > 5 and to_date(substring(titleshortstring, length(titleshortstring) - 3, length(titleshortstring)), 'YYYY') is not null then
+            -- Check if record exist
+            if exists
             (
-              -- Select records
+              -- Select record
               select
-              mf.titleshort
-              from moviefeed mf
+              ast.actionnumber as actionnumber
+              from actionstatus ast
               where
-              mf.titleshort = titleshortstring and
-              mf.actionstatus = actionstatusstring
-              group by mf.titleshort
+              ast.actionnumber = cast(actionstatusstring as int)
+              group by ast.actionnumber
             ) then
-              -- Begin begin/except
-              begin
-                -- Update record
-                update moviefeed
-                set
-                actionstatus = actionstatusstring,
-                modified_date = cast(current_timestamp as timestamp)
+              -- Check if record does not exists
+              if not exists
+              (
+                -- Select records
+                select
+                mf.titleshort
+                from moviefeed mf
                 where
-                moviefeed.titleshort = titleshortstring;
+                mf.titleshort = titleshortstring and
+                mf.actionstatus = cast(actionstatusstring as int)
+                group by mf.titleshort
+              ) then
+                -- Begin begin/except
+                begin
+                  -- Update record
+                  update moviefeed
+                  set
+                  actionstatus = cast(actionstatusstring as int),
+                  modified_date = cast(current_timestamp as timestamp)
+                  where
+                  moviefeed.titleshort = titleshortstring;
 
-                -- Set message
-                result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
-              exception when others then
-                -- Caught exception error
-                -- Get diagnostics information
-                get stacked diagnostics code = returned_sqlstate, msg = message_text;
+                  -- Set message
+                  result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
+                exception when others then
+                  -- Caught exception error
+                  -- Get diagnostics information
+                  get stacked diagnostics code = returned_sqlstate, msg = message_text;
 
+                  -- Set message
+                  result := concat('{"Status": "Error", "Message": "', msg, '"}');
+                -- End begin/except
+                end;
+              else
                 -- Set message
-                result := concat('{"Status": "Error", "Message": "', msg, '"}');
-              -- End begin/except
-              end;
+                result := concat('{"Status": "Success", "Message": "Record already exists"}');
+              end if;
             else
               -- Set message
-              result := concat('{"Status": "Success", "Message": "Record already exists"}');
+              result := concat('{"Status": "Error", "Message": "Action status value is invalid"}');
             end if;
           else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "Action status value is invalid"}');
+            result := concat('{"Status": "Error", "Message": "Title short does not follow the allowed value"}');
           end if;
         else
           -- Record does not exist
@@ -566,16 +570,20 @@ as $$
           tf.titlelong = titlelongstring
           group by tf.titlelong
         ) then
-          -- Check if record exist
+          -- Check if record exists
           if exists
           (
             -- Select record
             select
-            ast.actionnumber as actionnumber
+            titlelongstring as titlelong
             from actionstatus ast
+            join mediaaudioencode mae on mae.tvInclude in ('1') and titlelongstring ilike concat('%', mae.audioencode, '%')
+            left join mediadynamicrange mdr on mdr.tvInclude in ('1') and titlelongstring ilike concat('%', mdr.dynamicrange, '%')
+            join mediaresolution mr on mr.tvInclude in ('1') and titlelongstring ilike concat('%', mr.resolution, '%')
+            left join mediastreamsource mss on mss.tvInclude in ('1') and titlelongstring ilike concat('%', mss.streamsource, '%')
+            join mediavideoencode mve on mve.tvInclude in ('1') and titlelongstring ilike concat('%', mve.videoencode, '%')
             where
-            ast.actionnumber = actionstatus
-            group by ast.actionnumber
+            ast.actionnumber = cast(actionstatusstring as int)
           ) then
             -- Check if record does not exists
             if not exists
@@ -587,8 +595,8 @@ as $$
               where
               tf.titlelong = titlelongstring and
               tf.titleshort = titleshortstring and
-              tf.publish_date = publishdatestring and
-              tf.actionstatus = actionstatusstring
+              tf.publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US') and
+              tf.actionstatus = cast(actionstatusstring as int)
               group by tf.titlelong
             ) then
               -- Begin begin/except
@@ -598,7 +606,7 @@ as $$
                 set
                 titleshort = titleshortstring,
                 publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
-                actionstatus = actionstatusstring,
+                actionstatus = cast(actionstatusstring as int),
                 modified_date = cast(current_timestamp as timestamp)
                 where
                 tvfeed.titlelong = titlelongstring;
@@ -620,7 +628,7 @@ as $$
             end if;
           else
             -- Set message
-            result := concat('{"Status": "Error", "Message": "Action status value is invalid"}');
+            result := concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
           end if;
         else
             -- Record does not exist
@@ -670,7 +678,7 @@ as $$
               titleshort = titleshortstring,
               modified_date = cast(current_timestamp as timestamp)
               where
-              tvfeed.titlelong = titleshortoldstring;
+              tvfeed.titleshort = titleshortoldstring;
 
               -- Set message
               result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
@@ -725,7 +733,7 @@ as $$
             ast.actionnumber as actionnumber
             from actionstatus ast
             where
-            ast.actionnumber = actionstatus
+            ast.actionnumber = cast(actionstatusstring as int)
             group by ast.actionnumber
           ) then
             -- Check if record does not exists
@@ -737,7 +745,7 @@ as $$
               from tvfeed tf
               where
               tf.titleshort = titleshortstring and
-              tf.actionstatus = actionstatusstring
+              tf.actionstatus = cast(actionstatusstring as int)
               group by tf.titleshort
             ) then
               -- Begin begin/except
@@ -745,7 +753,7 @@ as $$
                 -- Update record
                 update tvfeed
                 set
-                actionstatus = actionstatusstring,
+                actionstatus = cast(actionstatusstring as int),
                 modified_date = cast(current_timestamp as timestamp)
                 where
                 tvfeed.titleshort = titleshortstring;

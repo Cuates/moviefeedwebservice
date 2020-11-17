@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: insertupdatedeletecontrolmediafeed
 --     Created: 11/16/2020
---     Updated: 11/16/2020
+--     Updated: 11/17/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete control media feed
@@ -14,7 +14,7 @@ use <databasename>;
 drop procedure if exists insertupdatedeletecontrolmediafeed;
 
 -- Procedure Create Or Replace
-create or replace procedure insertupdatedeletecontrolmediafeed(in optionMode text default null, in actionnumber text default null, in actiondescription text default null, in audioencode text default null, in dynamicrange text default null, in resolution text default null, in streamsource text default null, in streamdescription text default null, in videoencode text default null, in movieinclude text default null, in tvinclude text default null, inout status text default null)
+create or replace procedure insertupdatedeletecontrolmediafeed(in optionMode text default null, in actionnumber int default null, in actiondescription text default null, in audioencode text default null, in dynamicrange text default null, in resolution text default null, in streamsource text default null, in streamdescription text default null, in videoencode text default null, in movieinclude smallint default null, in tvinclude smallint default null, inout status text default null)
 as $$
   -- Declare variables
   declare omitOptionMode varchar(255) := '[^a-zA-Z]';
@@ -231,7 +231,7 @@ as $$
           ast.actionnumber
           from actionstatus ast
           where
-          ast.actionnumber = actionnumberstring
+          ast.actionnumber = cast(actionnumberstring as int)
           group by ast.actionnumber
         ) then
           -- Begin begin/except
@@ -246,7 +246,7 @@ as $$
             )
             values
             (
-              actionnumberstring,
+              cast(actionnumberstring as int),
               actiondescriptionstring,
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
@@ -306,8 +306,8 @@ as $$
             values
             (
               audioencodestring,
-              movieincludestring,
-              tvinclude,
+              cast(movieincludestring as smallint),
+              cast(tvincludestring as smallint),
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
             );
@@ -366,8 +366,8 @@ as $$
             values
             (
               dynamicrangestring,
-              movieincludestring,
-              tvincludestring,
+              cast(movieincludestring as smallint),
+              cast(tvincludestring as smallint),
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
             );
@@ -426,8 +426,8 @@ as $$
             values
             (
               resolutionstring,
-              movieincludestring,
-              tvincludestring,
+              cast(movieincludestring as smallint),
+              cast(tvincludestring as smallint),
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
             );
@@ -488,8 +488,8 @@ as $$
             (
               streamsourcestring,
               streamdescriptionstring,
-              movieincludestring,
-              tvincludestring,
+              cast(movieincludestring as smallint),
+              cast(tvincludestring as smallint),
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
             );
@@ -548,8 +548,8 @@ as $$
             values
             (
               videoencodestring,
-              movieincludestring,
-              tvincludestring,
+              cast(movieincludestring as smallint),
+              cast(tvincludestring as smallint),
               cast(current_timestamp as timestamp),
               cast(current_timestamp as timestamp)
             );
@@ -591,7 +591,7 @@ as $$
           ast.actionnumber
           from actionstatus ast
           where
-          ast.actionnumber = actionnumberstring
+          ast.actionnumber = cast(actionnumberstring as int)
           group by ast.actionnumber
         ) then
           -- Check if record does not exists
@@ -602,7 +602,7 @@ as $$
             ast.actionnumber
             from actionstatus ast
             where
-            ast.actionnumber = actionnumberstring and
+            ast.actionnumber = cast(actionnumberstring as int) and
             ast.actiondescription = actiondescriptionstring
             group by ast.actionnumber
           ) then
@@ -614,7 +614,7 @@ as $$
               actiondescription = actiondescriptionstring,
               modified_date = cast(current_timestamp as timestamp)
               where
-              actionstatus.actionnumber = actionnumberstring;
+              actionstatus.actionnumber = cast(actionnumberstring as int);
 
               -- Set message
               result := concat('{"Status": "Success", "Message": "Record(s) updated"}');
@@ -669,8 +669,8 @@ as $$
             from mediaaudioencode mae
             where
             mae.audioencode = audioencodestring and
-            mae.movieinclude = movieincludestring and
-            mae.tvinclude = tvincludestring
+            mae.movieinclude = cast(movieincludestring as smallint) and
+            mae.tvinclude = cast(tvincludestring as smallint)
             group by mae.audioencode
           ) then
             -- Begin begin/except
@@ -678,8 +678,8 @@ as $$
               -- Update record
               update mediaaudioencode
               set
-              movieInclude = movieincludestring,
-              tvInclude = tvincludestring,
+              movieInclude = cast(movieincludestring as smallint),
+              tvInclude = cast(tvincludestring as smallint),
               modified_date = cast(current_timestamp as timestamp)
               where
               mediaaudioencode.audioencode = audioencodestring;
@@ -737,8 +737,8 @@ as $$
             from mediadynamicrange mdr
             where
             mdr.dynamicrange = dynamicrange and
-            mdr.movieinclude = movieinclude and
-            mdr.tvinclude = tvinclude
+            mdr.movieinclude = cast(movieincludestring as smallint) and
+            mdr.tvinclude = cast(tvincludestring as smallint)
             group by mdr.dynamicrange
           ) then
             -- Begin begin/except
@@ -746,8 +746,8 @@ as $$
               -- Update record
               update mediadynamicrange
               set
-              movieInclude = movieincludestring,
-              tvInclude = tvincludestring,
+              movieInclude = cast(movieincludestring as smallint),
+              tvInclude = cast(tvincludestring as smallint),
               modified_date = cast(current_timestamp as timestamp)
               where
               mediadynamicrange.dynamicrange = dynamicrangestring;
@@ -805,8 +805,8 @@ as $$
             from mediaresolution mr
             where
             mr.resolution = resolutionstring and
-            mr.movieinclude = movieincludestring and
-            mr.tvinclude = tvincludestring
+            mr.movieinclude = cast(movieincludestring as smallint) and
+            mr.tvinclude = cast(tvincludestring as smallint)
             group by mr.resolution
           ) then
             -- Begin begin/except
@@ -814,8 +814,8 @@ as $$
               -- Update record
               update mediaresolution
               set
-              movieInclude = movieincludestring,
-              tvInclude = tvincludestring,
+              movieInclude = cast(movieincludestring as smallint),
+              tvInclude = cast(tvincludestring as smallint),
               modified_date = cast(current_timestamp as timestamp)
               where
               mediaresolution.resolution = resolutionstring;
@@ -874,8 +874,8 @@ as $$
             where
             mss.streamsource = streamsourcestring and
             mss.streamdescription = streamdescriptionstring and
-            mss.movieinclude = movieincludestring and
-            mss.tvinclude = tvincludestring
+            mss.movieinclude = cast(movieincludestring as smallint) and
+            mss.tvinclude = cast(tvincludestring as smallint)
             group by mss.streamsource
           ) then
             -- Begin begin/except
@@ -884,8 +884,8 @@ as $$
               update mediastreamsource
               set
               streamdescription = streamdescriptionstring,
-              movieInclude = movieincludestring,
-              tvInclude = tvincludestring,
+              movieInclude = cast(movieincludestring as smallint),
+              tvInclude = cast(tvincludestring as smallint),
               modified_date = cast(current_timestamp as timestamp)
               where
               mediastreamsource.streamsource = streamsourcestring;
@@ -943,8 +943,8 @@ as $$
             from mediavideoencode mve
             where
             mve.videoencode = videoencodestring and
-            mve.movieInclude = movieincludestring and
-            mve.tvInclude = tvincludestring
+            mve.movieInclude = cast(movieincludestring as smallint) and
+            mve.tvInclude = cast(tvincludestring as smallint)
             group by mve.videoencode
           ) then
             -- Begin begin/except
@@ -952,8 +952,8 @@ as $$
               -- Update record
               update mediavideoencode
               set
-              movieInclude = movieincludestring,
-              tvInclude = tvincludestring,
+              movieInclude = cast(movieincludestring as smallint),
+              tvInclude = cast(tvincludestring as smallint),
               modified_date = cast(current_timestamp as timestamp)
               where
               mediavideoencode.videoencode = videoencodestring;
@@ -999,7 +999,7 @@ as $$
           ast.actionnumber
           from actionstatus ast
           where
-          ast.actionnumber = actionnumberstring
+          ast.actionnumber = cast(actionnumberstring as int)
           group by ast.actionnumber
         ) then
           -- Begin begin/except
@@ -1008,7 +1008,7 @@ as $$
             delete
             from actionstatus ast
             where
-            ast.actionnumber = actionnumberstring;
+            ast.actionnumber = cast(actionnumberstring as int);
 
             -- Set message
             result := concat('{"Status": "Success", "Message": "Record(s) deleted"}');
