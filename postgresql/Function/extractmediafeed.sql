@@ -4,7 +4,7 @@
 -- =================================================
 --        File: extractmediafeed
 --     Created: 11/10/2020
---     Updated: 11/16/2020
+--     Updated: 11/17/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Extract media feed
@@ -418,15 +418,6 @@ as $$
         '%s',
         dSQL
         ) using cast(titleshort as citext), cast(actionstatus as int), cast("limit" as int);
-      elseif titlelong is null and titleshort is null and actionstatus is not null then
-        -- Else if execute all parameters statement NNY
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
-        -- Execute dynamic statement with the parameterized values
-        -- Return dynamic sql
-        return query execute format(
-        '%s',
-        dSQL
-        ) using cast(actionstatus as int), cast("limit" as int);
       elseif titlelong is null and titleshort is null and actionstatus is not null then
         -- Else if execute all parameters statement NNY
         -- Important Note: Parameterizated values need to match the placeholders they are matching
