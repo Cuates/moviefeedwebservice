@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: extractmediafeed
 --     Created: 11/07/2020
---     Updated: 11/09/2020
+--     Updated: 11/16/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Extract media feed
@@ -187,7 +187,7 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
       mf.titlelong as `Title Long`,
       mf.titleshort as `Title Short`,
       date_format(mf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `Publish Date`,
-      mf.actionstatus as `Action Status`
+      cast(mf.actionstatus as char) as `Action Status`
       from moviefeed mf';
 
       -- Check if where clause is given
@@ -241,37 +241,42 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
 
       -- Check if parameters were set
       if @titlelong is not null and @titleshort is null and @actionstatus is null then
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching YNN
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titlelong, @`limit`;
       elseif @titlelong is not null and @titleshort is not null and @actionstatus is null then
         -- Else if execute one parameter and not the other statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching YYN
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titlelong, @titleshort, @`limit`;
       elseif @titlelong is not null and @titleshort is null and @actionstatus is not null then
         -- Else if execute one parameter and not the other statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching YNY
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titlelong, @actionstatus, @`limit`;
       elseif @titlelong is null and @titleshort is not null and @actionstatus is null then
         -- Else if execute one parameter and not the other statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching NYN
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titleshort, @`limit`;
       elseif @titlelong is null and @titleshort is not null and @actionstatus is not null then
         -- Else if execute one parameter and not the other statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching NYY
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titleshort, @actionstatus, @`limit`;
+      elseif @titlelong is null and @titleshort is null and @actionstatus is not null then
+        -- Else if execute one parameter and not the other statement
+        -- Important Note: Parameterizated values need to match the placeholders they are matching NNY
+        -- Execute dynamic statement with the parameterized values
+        execute queryStatement using @actionstatus, @`limit`;
       elseif @titlelong is not null and @titleshort is not null and @actionstatus is not null then
         -- Else if execute all parameters statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching YYY
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @titlelong, @titleshort, @actionstatus, @`limit`;
       else
         -- Else execute default statement
-        -- Important Note: Parameterizated values need to match the placeholders they are matching
+        -- Important Note: Parameterizated values need to match the placeholders they are matching NNN
         -- Execute dynamic statement with the parameterized values
         execute queryStatement using @`limit`;
       end if;
@@ -306,7 +311,7 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
       tvf.titlelong as `Title Long`,
       tvf.titleshort as `Title Short`,
       date_format(tvf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `Publish Date`,
-      tvf.actionstatus as `Action Status`
+      cast(tvf.actionstatus as char) as `Action Status`
       from tvfeed tvf';
 
       -- Check if where clause is given

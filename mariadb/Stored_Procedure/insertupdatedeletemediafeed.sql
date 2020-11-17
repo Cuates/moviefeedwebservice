@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/06/2020
---     Updated: 11/16/2020
+--     Updated: 11/17/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -228,7 +228,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                 end if;
             else
               -- Set message
-              set result = concat('{"Status": "Error", "Message": "Title long does not follow the allowed values"}');
+              set result = concat('{"Status": "Error", "Message": "Title long and action number does not follow the allowed values"}');
             end if;
           else
             -- Set message
@@ -263,66 +263,60 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
           tf.titlelong = titlelong
           group by tf.titlelong
         ) then
-          -- Check if year string is greater than 5 and string is a valid year
-          if char_length(titleshort) > 5 and str_to_date(substring(titleshort, char_length(titleshort) - 3, char_length(titleshort)), '%Y') is not null then
-            -- Check if record exists
-            if exists
-            (
-              -- Select record
-              select
-              titlelong as `titlelong`
-              from actionstatus ast
-              join mediaaudioencode mae on mae.movieInclude in (1) and titlelong like concat('%', mae.audioencode, '%')
-              left join mediadynamicrange mdr on mdr.movieInclude in (1) and titlelong like concat('%', mdr.dynamicrange, '%')
-              join mediaresolution mr on mr.movieInclude in (1) and titlelong like concat('%', mr.resolution, '%')
-              left join mediastreamsource mss on mss.movieInclude in (1) and titlelong like concat('%', mss.streamsource, '%')
-              join mediavideoencode mve on mve.movieInclude in (1) and titlelong like concat('%', mve.videoencode, '%')
-              where
-              ast.actionnumber = actionstatus
-            ) then
-              -- Start the tranaction
-              start transaction;
-                -- Insert record
-                insert into tvfeed
-                (
-                  titlelong,
-                  titleshort,
-                  publish_date,
-                  actionstatus,
-                  created_date,
-                  modified_date
-                )
-                values
-                (
-                  titlelong,
-                  titleshort,
-                  date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
-                  actionstatus,
-                  current_timestamp(6),
-                  current_timestamp(6)
-                );
+          -- Check if record exists
+          if exists
+          (
+            -- Select record
+            select
+            titlelong as `titlelong`
+            from actionstatus ast
+            join mediaaudioencode mae on mae.tvInclude in (1) and titlelong like concat('%', mae.audioencode, '%')
+            left join mediadynamicrange mdr on mdr.tvInclude in (1) and titlelong like concat('%', mdr.dynamicrange, '%')
+            join mediaresolution mr on mr.tvInclude in (1) and titlelong like concat('%', mr.resolution, '%')
+            left join mediastreamsource mss on mss.tvInclude in (1) and titlelong like concat('%', mss.streamsource, '%')
+            join mediavideoencode mve on mve.tvInclude in (1) and titlelong like concat('%', mve.videoencode, '%')
+            where
+            ast.actionnumber = actionstatus
+          ) then
+            -- Start the tranaction
+            start transaction;
+              -- Insert record
+              insert into tvfeed
+              (
+                titlelong,
+                titleshort,
+                publish_date,
+                actionstatus,
+                created_date,
+                modified_date
+              )
+              values
+              (
+                titlelong,
+                titleshort,
+                date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
+                actionstatus,
+                current_timestamp(6),
+                current_timestamp(6)
+              );
 
-                -- Check whether the insert was successful
-                if code = successcode then
-                  -- Commit transactional statement
-                  commit;
+              -- Check whether the insert was successful
+              if code = successcode then
+                -- Commit transactional statement
+                commit;
 
-                  -- Set message
-                  set result = concat('{"Status": "Success", "Message": "Record(s) inserted"}');
-                else
-                  -- Rollback to the previous state before the transaction was called
-                  rollback;
+                -- Set message
+                set result = concat('{"Status": "Success", "Message": "Record(s) inserted"}');
+              else
+                -- Rollback to the previous state before the transaction was called
+                rollback;
 
-                  -- Set message
-                  set result = concat('{"Status": "Error", "Message": "', msg, '"}');
-                end if;
-            else
-              -- Set message
-              set result = concat('{"Status": "Error", "Message": "Title long does not follow the allowed values"}');
-            end if;
+                -- Set message
+                set result = concat('{"Status": "Error", "Message": "', msg, '"}');
+              end if;
           else
             -- Set message
-            set result = concat('{"Status": "Error", "Message": "Title short does not follow the allowed value"}');
+            set result = concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
           end if;
         else
           -- Record already exist
@@ -355,16 +349,20 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
         ) then
           -- Check if year string is greater than 5 and string is a valid year
           if char_length(titleshort) > 5 and str_to_date(substring(titleshort, char_length(titleshort) - 3, char_length(titleshort)), '%Y') is not null then
-            -- Check if record exist
+            -- Check if record exists
             if exists
             (
               -- Select record
               select
-              ast.actionnumber as `actionnumber`
+              titlelong as `titlelong`
               from actionstatus ast
+              join mediaaudioencode mae on mae.movieInclude in (1) and titlelong like concat('%', mae.audioencode, '%')
+              left join mediadynamicrange mdr on mdr.movieInclude in (1) and titlelong like concat('%', mdr.dynamicrange, '%')
+              join mediaresolution mr on mr.movieInclude in (1) and titlelong like concat('%', mr.resolution, '%')
+              left join mediastreamsource mss on mss.movieInclude in (1) and titlelong like concat('%', mss.streamsource, '%')
+              join mediavideoencode mve on mve.movieInclude in (1) and titlelong like concat('%', mve.videoencode, '%')
               where
               ast.actionnumber = actionstatus
-              group by ast.actionnumber
             ) then
               -- Check if record does not exists
               if not exists
@@ -412,7 +410,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
               end if;
             else
               -- Set message
-              set result = concat('{"Status": "Error", "Message": "Action status value is invalid"}');
+              set result = concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
             end if;
           else
             -- Set message
@@ -468,7 +466,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                 mf.titleshort = titleshort,
                 mf.modified_date = current_timestamp(6)
                 where
-                mf.titlelong = titleshortold;
+                mf.titleshort = titleshortold;
 
                 -- Check whether the update was successful
                 if code = successcode then
@@ -548,7 +546,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
               -- Start the tranaction
               start transaction;
                 -- Update record
-                update moviefeed
+                update moviefeed mf
                 set
                 mf.actionstatus = actionstatus,
                 mf.modified_date = current_timestamp(6)
@@ -606,16 +604,20 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
           tf.titlelong = titlelong
           group by tf.titlelong
         ) then
-          -- Check if record exist
+          -- Check if record exists
           if exists
           (
             -- Select record
             select
-            ast.actionnumber as `actionnumber`
+            titlelong as `titlelong`
             from actionstatus ast
+            join mediaaudioencode mae on mae.tvInclude in (1) and titlelong like concat('%', mae.audioencode, '%')
+            left join mediadynamicrange mdr on mdr.tvInclude in (1) and titlelong like concat('%', mdr.dynamicrange, '%')
+            join mediaresolution mr on mr.tvInclude in (1) and titlelong like concat('%', mr.resolution, '%')
+            left join mediastreamsource mss on mss.tvInclude in (1) and titlelong like concat('%', mss.streamsource, '%')
+            join mediavideoencode mve on mve.tvInclude in (1) and titlelong like concat('%', mve.videoencode, '%')
             where
             ast.actionnumber = actionstatus
-            group by ast.actionnumber
           ) then
             -- Check if record does not exists
             if not exists
@@ -663,7 +665,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
             end if;
           else
             -- Set message
-            set result = concat('{"Status": "Error", "Message": "Action status value is invalid"}');
+            set result = concat('{"Status": "Error", "Message": "Title long and or action status does not follow the allowed values"}');
           end if;
         else
           -- Record does not exist
@@ -713,7 +715,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
               tf.titleshort = titleshort,
               tf.modified_date = current_timestamp(6)
               where
-              tf.titlelong = titleshortold;
+              tf.titleshort = titleshortold;
 
               -- Check whether the update was successful
               if code = successcode then
