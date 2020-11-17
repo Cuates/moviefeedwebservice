@@ -17,7 +17,7 @@ go
 -- ================================================
 --        File: insertupdatedeleteMediaFeed
 --     Created: 11/05/2020
---     Updated: 11/16/2020
+--     Updated: 11/17/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -564,7 +564,7 @@ begin
                           titleshort = @titleshort,
                           modified_date = cast(getdate() as datetime2(6))
                           where
-                          titlelong = @titleshortold
+                          titleshort = @titleshortold
                           
                           -- Check if there is trans count
                           if @@trancount > 0
