@@ -1,7 +1,7 @@
 ##
 #        File: moviefeedtitleshortclass.py
 #     Created: 11/10/2020
-#     Updated: 11/15/2020
+#     Updated: 11/17/2020
 #  Programmer: Cuates
 #  Updated By: Cuates
 #     Purpose: Movie feed title short web service
@@ -55,32 +55,45 @@ class MovieFeedTitleShortClass(Resource):
           if payloadResponse.get('Status') != None:
             # Check if status is success
             if payloadResponse['Status'] == 'Success':
+              # Set variable
+              statusVal = 'Success'
+              messageVal = 'Processed request'
+              selectColumn = 'select titlelongreturn as "Title Long", titleshortreturn as "Title Short", publishdatereturn as "Publish Date", actionstatusreturn as "Action Status"'
+
               # Initialize list
               possibleParams = ['titlelong', 'titleshort', 'actionstatus', 'limit', 'sort']
 
               # Extract movie feed
-              #resultDict = mfwsclass._extractMovieFeed('MariaDBSQLMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._extractMovieFeed('PGSQLMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._extractMovieFeed('MSSQLLMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._extractMovieFeed('MSSQLWMovie', 'extracting', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._extractMovieFeed('MariaDBSQLMovie', 'extracting', '', 'extractmediafeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._extractMovieFeed('PGSQLMovie', 'extracting', selectColumn, 'extractmediafeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._extractMovieFeed('MSSQLLMovie', 'extracting', '', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._extractMovieFeed('MSSQLWMovie', 'extracting', '', 'dbo.extractMediaFeed', 'extractMovieFeed', possibleParams, payloadResponse['Result'])
 
               # Check if there is data
               if resultDict:
                 # Loop through sub elements
                 for systemEntries in resultDict:
                   # Check if elements exists
-                  if systemEntries.get('SError') == None:
-                      # Store Message
-                      returnDict = {'Status': 'Success', 'Message': 'Processed request', 'Count': len(resultDict), 'Result': resultDict}
-                  else:
-                    # Store Message
-                    returnDict = {'Status': systemEntries['SError'], 'Message': systemEntries['SMessage'], 'Count': 0, 'Result': []}
+                  if systemEntries.get('SError') != None:
+                    # Store status value
+                    statusVal = systemEntries['SError']
+
+                    # Store message value
+                    messageVal = systemEntries['SMessage']
 
                     # Set code
                     codeVal = 500
 
                     # Break out of loop
                     break
+
+                # Check if status value is success
+                if statusVal == 'Success':
+                  # Store Message
+                  returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': len(resultDict), 'Result': resultDict}
+                else:
+                  # Store Message
+                  returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': 0, 'Result': []}
               else:
                 # Store Message
                 returnDict = {'Status': 'Success', 'Message': 'Processed request', 'Count': 0, 'Result': []}
@@ -154,27 +167,42 @@ class MovieFeedTitleShortClass(Resource):
           if payloadResponse.get('Status') != None:
             # Check if status is success
             if payloadResponse['Status'] == 'Success':
+              # Set variable
+              statusVal = 'Success'
+              messageVal = 'Processed request'
+
               # Initailize list
-              possibleParams = ['titlelong', 'titleshort', 'publishdate', 'actionstatus']
+              possibleParams = ['titlelong', 'titleshort', 'titleshortold', 'publishdate', 'actionstatus']
+              removeParams = ['titleshortold']
 
               # Insert movie feed
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'inserting', 'insertupdatedeletemediafeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'inserting', 'dbo.insertupdatedeleteMediaFeed', 'insertMovieFeed', possibleParams, payloadResponse['Result'], removeParams)
 
               # Loop through sub elements
               for systemEntries in resultDict:
                 # Check if elements exists
-                if systemEntries.get('SError') == None:
-                  # Store Message
-                  returnDict = {'Status': 'Success', 'Message': 'Processed request', 'Count': len(resultDict), 'Result': resultDict}
-                else:
-                  # Store Message
-                  returnDict = {'Status': systemEntries['SError'], 'Message': systemEntries['SMessage'], 'Count': 0, 'Result': []}
+                if systemEntries.get('SError') != None:
+                  # Store status value
+                  statusVal = systemEntries['SError']
 
-                  # Break out of loop
+                  # Store message value
+                  messageVal = systemEntries['SMessage']
+
+                  # Set code
+                  codeVal = 500
+
+                  # Break out of the loop
                   break
+
+              if statusVal == 'Success':
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': len(resultDict), 'Result': resultDict}
+              else:
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': 0, 'Result': []}
             else:
               # Store Message
               returnDict = {'Status': payloadResponse['Status'], 'Message': payloadResponse['Message'], 'Count': 0, 'Result': []}
@@ -242,27 +270,42 @@ class MovieFeedTitleShortClass(Resource):
           if payloadResponse.get('Status') != None:
             # Check if status is success
             if payloadResponse['Status'] == 'Success':
+              # Set variable
+              statusVal = 'Success'
+              messageVal = 'Processed request'
+
               # Initailize list
-              possibleParams = ['titleshort', 'titleshortold']
+              possibleParams = ['titlelong', 'titleshort', 'titleshortold', 'publishdate', 'actionstatus']
+              removeParams = ['titlelong', 'publishdate', 'actionstatus']
 
               # Update movie feed
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'updating', 'insertupdatedeletemediafeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'updating', 'dbo.insertupdatedeleteMediaFeed', 'updateMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
 
               # Loop through sub elements
               for systemEntries in resultDict:
                 # Check if elements exists
-                if systemEntries.get('SError') == None:
-                  # Store Message
-                  returnDict = {'Status': 'Success', 'Message': 'Processed request', 'Count': len(resultDict), 'Result': resultDict}
-                else:
-                  # Store Message
-                  returnDict = {'Status': systemEntries['SError'], 'Message': systemEntries['SMessage'], 'Count': 0, 'Result': []}
+                if systemEntries.get('SError') != None:
+                  # Store status value
+                  statusVal = systemEntries['SError']
 
-                  # Break out of loop
+                  # Store message value
+                  messageVal = systemEntries['SMessage']
+
+                  # Set code
+                  codeVal = 500
+
+                  # Break out of the loop
                   break
+
+              if statusVal == 'Success':
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': len(resultDict), 'Result': resultDict}
+              else:
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': 0, 'Result': []}
             else:
               # Store Message
               returnDict = {'Status': payloadResponse['Status'], 'Message': payloadResponse['Message'], 'Count': 0, 'Result': []}
@@ -330,27 +373,42 @@ class MovieFeedTitleShortClass(Resource):
           if payloadResponse.get('Status') != None:
             # Check if status is success
             if payloadResponse['Status'] == 'Success':
+              # Set variable
+              statusVal = 'Success'
+              messageVal = 'Processed request'
+
               # Initailize list
-              possibleParams = ['titleshort']
+              possibleParams = ['titlelong', 'titleshort', 'titleshortold', 'publishdate', 'actionstatus']
+              removeParams = ['titlelong', 'titleshortold', 'publishdate', 'actionstatus']
 
               # Delete movie feed
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              #resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'deleting', 'dbo.insertupdatedeleteMediaFeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
-              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'deleting', 'dbo.insertupdatedeleteMediaFeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'])
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MariaDBSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('PGSQLMovie', 'deleting', 'insertupdatedeletemediafeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLLMovie', 'deleting', 'dbo.insertupdatedeleteMediaFeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
+              resultDict = mfwsclass._insertupdatedeleteMovieFeed('MSSQLWMovie', 'deleting', 'dbo.insertupdatedeleteMediaFeed', 'deleteMovieFeedTitleShort', possibleParams, payloadResponse['Result'], removeParams)
 
               # Loop through sub elements
               for systemEntries in resultDict:
                 # Check if elements exists
-                if systemEntries.get('SError') == None:
-                  # Store Message
-                  returnDict = {'Status': 'Success', 'Message': 'Processed request', 'Count': len(resultDict), 'Result': resultDict}
-                else:
-                  # Store Message
-                  returnDict = {'Status': systemEntries['SError'], 'Message': systemEntries['SMessage'], 'Count': 0, 'Result': []}
+                if systemEntries.get('SError') != None:
+                  # Store status value
+                  statusVal = systemEntries['SError']
 
-                  # Break out of loop
+                  # Store message value
+                  messageVal = systemEntries['SMessage']
+
+                  # Set code
+                  codeVal = 500
+
+                  # Break out of the loop
                   break
+
+              if statusVal == 'Success':
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': len(resultDict), 'Result': resultDict}
+              else:
+                # Store Message
+                returnDict = {'Status': statusVal, 'Message': messageVal, 'Count': 0, 'Result': []}
             else:
               # Store Message
               returnDict = {'Status': payloadResponse['Status'], 'Message': payloadResponse['Message'], 'Count': 0, 'Result': []}

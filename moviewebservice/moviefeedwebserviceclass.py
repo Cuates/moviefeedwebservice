@@ -1,7 +1,7 @@
 ##
 #        File: moviefeedwebserviceclass.py
 #     Created: 11/10/2020
-#     Updated: 11/14/2020
+#     Updated: 11/17/2020
 #  Programmer: Cuates
 #  Updated By: Cuates
 #     Purpose: Movie feed web service class
@@ -31,10 +31,9 @@ class MovieFeedWebServiceClass():
     pass
 
   # Extract movie feed
-  def _extractMovieFeed(self, type, actionWord, procedure, optionMode, possibleParams, feedStorage):
+  def _extractMovieFeed(self, type, actionWord, selectColumn, procedure, optionMode, possibleParams, feedStorage):
     # Initialize list and dictionary
-    returnMessage = {}
-    resultSet = []
+    returnMessage = []
 
     # Try to execute the command(s)
     try:
@@ -77,13 +76,18 @@ class MovieFeedWebServiceClass():
                     query = sqlalchemy.text('call ' + procedure + ' (\'' + optionMode + '\'' + buildQueryEntry['Query'] + ');', bindparams=bindParamHeader)
                   # PostgreSQL query statement
                   elif regEx.match(r'PGSQL[a-zA-Z]{0,}', type, flags=regEx.IGNORECASE):
+                    # Check if variable is an empty string
+                    if selectColumn.strip() == '':
+                      # Set variable
+                      selectColumn = 'select titlelongreturn as "Title Long"'
+
                     # Convert statement to text
-                    query = sqlalchemy.text('call ' + procedure + ' (\'' + optionMode + '\'' + buildQueryEntry['Query'] + ');', bindparams=bindParamHeader)
+                    query = sqlalchemy.text(selectColumn + ' from ' + procedure + ' (\'' + optionMode + '\'' + buildQueryEntry['Query'] + ');', bindparams=bindParamHeader)
                   # MSSQL query statement
                   elif regEx.match(r'MSSQL[a-zA-Z]{0,}', type, flags=regEx.IGNORECASE):
                     # Convert statement to text
                     query = sqlalchemy.text('exec ' + procedure + ' @optionMode = \'' + optionMode + '\'' + buildQueryEntry['Query'], bindparams=bindParamHeader)
-
+                  print(f'query: {query}')
                   # Check if query is empty
                   if query != '':
                     # Execute many queries
@@ -100,7 +104,7 @@ class MovieFeedWebServiceClass():
                       # Loop through database response
                       for entry in fetchRecord:
                         # Append column headers with records
-                        resultSet.append(dict(zip(columnHeader, entry)))
+                        returnMessage.append(dict(zip(columnHeader, entry)))
                   else:
                     # Set message
                     returnMessage = [{'SError': 'Error', 'SMessage': 'Query not defined'}]
@@ -116,9 +120,6 @@ class MovieFeedWebServiceClass():
 
               # Break from loop
               break
-
-        # Set return message
-        returnMessage = resultSet
 
         # Check if execution has executed
         if (messageResponse):
@@ -145,10 +146,9 @@ class MovieFeedWebServiceClass():
     return returnMessage
 
   # Insert, Update, or Delete movie feed
-  def _insertupdatedeleteMovieFeed(self, type, actionWord, procedure, optionMode, possibleParams, feedStorage):
+  def _insertupdatedeleteMovieFeed(self, type, actionWord, procedure, optionMode, possibleParams, feedStorage, removeParams):
     # Initialize list/dictionary
-    returnMessage = {}
-    resultSet = []
+    returnMessage = []
 
     # Try to execute the command(s)
     try:
@@ -220,7 +220,20 @@ class MovieFeedWebServiceClass():
                         newDictionary.update(json.loads(entry['status']))
 
                         # Append to list
-                        resultSet.append(newDictionary)
+                        returnMessage.append(newDictionary)
+
+                      # Check if list is not empty
+                      if returnMessage:
+                        # Check if list is not empty
+                        if removeParams:
+                          # Loop through sub elements
+                          for subEntries in returnMessage:
+                            # Loop through possible remove params
+                            for popEntry in removeParams:
+                              # Check if key exists
+                              if subEntries.get(popEntry) != None:
+                                # Remove item by key name
+                                del subEntries[popEntry]
                   else:
                     # Set message
                     returnMessage = [{'SError': 'Error', 'SMessage': 'Query statement not defined'}]
@@ -236,9 +249,6 @@ class MovieFeedWebServiceClass():
 
               # Break from loop
               break
-
-        # Set return message
-        returnMessage = resultSet
 
         # Check if execution has executed
         if (messageResponse):
