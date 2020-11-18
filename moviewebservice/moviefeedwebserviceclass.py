@@ -1,7 +1,7 @@
 ##
 #        File: moviefeedwebserviceclass.py
 #     Created: 11/10/2020
-#     Updated: 11/17/2020
+#     Updated: 11/18/2020
 #  Programmer: Cuates
 #  Updated By: Cuates
 #     Purpose: Movie feed web service class
@@ -87,7 +87,7 @@ class MovieFeedWebServiceClass():
                   elif regEx.match(r'MSSQL[a-zA-Z]{0,}', type, flags=regEx.IGNORECASE):
                     # Convert statement to text
                     query = sqlalchemy.text('exec ' + procedure + ' @optionMode = \'' + optionMode + '\'' + buildQueryEntry['Query'], bindparams=bindParamHeader)
-                  print(f'query: {query}')
+
                   # Check if query is empty
                   if query != '':
                     # Execute many queries

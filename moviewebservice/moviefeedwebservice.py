@@ -1,7 +1,7 @@
 ##
 #        File: moviefeedwebservice.py
 #     Created: 11/10/2020
-#     Updated: 11/14/2020
+#     Updated: 11/18/2020
 #  Programmer: Cuates
 #  Updated By: Cuates
 #     Purpose: Movie feed web service
@@ -46,7 +46,7 @@ try:
       messageVal = 'ErrorHandler'
 
       # Log message
-      tfwsclass._setLogger('ErrorHandler ' + str(e))
+      mfwsclass._setLogger('ErrorHandler ' + str(e))
 
     # Return message
     return {'Status': 'Error', 'Message': messageVal, 'Count': 0, 'Result': []}, codeVal
@@ -78,4 +78,4 @@ except Exception as e:
 # Run program
 if __name__ == '__main__':
   # Run app
-  app.run(host='127.0.0.1', port=5001, debug=True, threaded=True)
+  app.run(host='127.0.0.1', port=4817, debug=True, threaded=True)
