@@ -1,10 +1,10 @@
 -- Database Connect
-use <databasename>;
+-- use <databasename>;
 
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/10/2020
---     Updated: 11/17/2020
+--     Updated: 12/02/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -179,7 +179,7 @@ as $$
                 )
                 values
                 (
-                  titlelongstring,
+                  lower(titlelongstring),
                   titleshortstring,
                   to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
                   cast(actionstatusstring as int),
@@ -264,7 +264,7 @@ as $$
               )
               values
               (
-                titlelongstring,
+                lower(titlelongstring),
                 titleshortstring,
                 to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
                 cast(actionstatusstring as int),
@@ -352,7 +352,7 @@ as $$
                   -- Update record
                   update moviefeed
                   set
-                  titleshort = titleshortstring,
+                  titleshort = lower(titleshortstring),
                   publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
                   actionstatus = cast(actionstatusstring as int),
                   modified_date = cast(current_timestamp as timestamp)
@@ -429,7 +429,7 @@ as $$
                 -- Update record
                 update moviefeed
                 set
-                titleshort = titleshortstring,
+                titleshort = lower(titleshortstring),
                 modified_date = cast(current_timestamp as timestamp)
                 where
                 moviefeed.titleshort = titleshortoldstring;
@@ -604,7 +604,7 @@ as $$
                 -- Update record
                 update tvfeed
                 set
-                titleshort = titleshortstring,
+                titleshort = lower(titleshortstring),
                 publish_date = to_timestamp(publishdatestring, 'YYYY-MM-DD HH24:MI:SS.US'),
                 actionstatus = cast(actionstatusstring as int),
                 modified_date = cast(current_timestamp as timestamp)
@@ -675,7 +675,7 @@ as $$
               -- Update record
               update tvfeed
               set
-              titleshort = titleshortstring,
+              titleshort = lower(titleshortstring),
               modified_date = cast(current_timestamp as timestamp)
               where
               tvfeed.titleshort = titleshortoldstring;
