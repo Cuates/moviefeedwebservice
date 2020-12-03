@@ -1,10 +1,10 @@
 -- Database Connect
-use <databasename>;
+-- use <databasename>;
 
 -- =================================================
 --        File: insertupdatedeletemediafeed
 --     Created: 11/06/2020
---     Updated: 11/17/2020
+--     Updated: 12/02/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -205,7 +205,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                 values
                 (
                   titlelong,
-                  titleshort,
+                  lower(titleshort),
                   date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
                   actionstatus,
                   current_timestamp(6),
@@ -293,7 +293,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
               values
               (
                 titlelong,
-                titleshort,
+                lower(titleshort),
                 date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
                 actionstatus,
                 current_timestamp(6),
@@ -383,7 +383,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                   -- Update record
                   update moviefeed mf
                   set
-                  mf.titleshort = titleshort,
+                  mf.titleshort = lower(titleshort),
                   mf.publish_date = date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
                   mf.actionstatus = actionstatus,
                   mf.modified_date = current_timestamp(6)
@@ -463,7 +463,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                 -- Update record
                 update moviefeed mf
                 set
-                mf.titleshort = titleshort,
+                mf.titleshort = lower(titleshort),
                 mf.modified_date = current_timestamp(6)
                 where
                 mf.titleshort = titleshortold;
@@ -638,7 +638,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
                 -- Update record
                 update tvfeed tf
                 set
-                tf.titleshort = titleshort,
+                tf.titleshort = lower(titleshort),
                 tf.publish_date = date_format(publishdate, '%Y-%m-%d %H:%i:%s.%f'),
                 tf.actionstatus = actionstatus,
                 tf.modified_date = current_timestamp(6)
@@ -712,7 +712,7 @@ create procedure `insertupdatedeletemediafeed`(in optionMode text, in titlelong 
               -- Update record
               update tvfeed tf
               set
-              tf.titleshort = titleshort,
+              tf.titleshort = lower(titleshort),
               tf.modified_date = current_timestamp(6)
               where
               tf.titleshort = titleshortold;
