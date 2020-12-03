@@ -17,7 +17,7 @@ go
 -- ================================================
 --        File: insertupdatedeleteMediaFeed
 --     Created: 11/05/2020
---     Updated: 11/17/2020
+--     Updated: 12/02/2020
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Insert update delete media feed
@@ -229,7 +229,7 @@ begin
                           values
                           (
                             @titlelong,
-                            @titleshort,
+                            lower(@titleshort),
                             cast(@publishdate as datetime2(6)),
                             @actionstatus,
                             cast(getdate() as datetime2(6)),
@@ -342,7 +342,7 @@ begin
                       values
                       (
                         @titlelong,
-                        @titleshort,
+                        lower(@titleshort),
                         cast(@publishdate as datetime2(6)),
                         @actionstatus,
                         cast(getdate() as datetime2(6)),
@@ -453,7 +453,7 @@ begin
                               -- Insert record
                               update dbo.MovieFeed
                               set
-                              titleshort = @titleshort,
+                              titleshort = lower(@titleshort),
                               publish_date = cast(@publishdate as datetime2(6)),
                               actionstatus = @actionstatus,
                               modified_date =  cast(getdate() as datetime2(6))
@@ -561,7 +561,7 @@ begin
                           -- Insert record
                           update dbo.MovieFeed
                           set
-                          titleshort = @titleshort,
+                          titleshort = lower(@titleshort),
                           modified_date = cast(getdate() as datetime2(6))
                           where
                           titleshort = @titleshortold
@@ -784,7 +784,7 @@ begin
                           -- Insert record
                           update dbo.TVFeed
                           set
-                          titleshort = @titleshort,
+                          titleshort = lower(@titleshort),
                           publish_date = cast(@publishdate as datetime2(6)),
                           actionstatus = @actionstatus,
                           modified_date = cast(getdate() as datetime2(6))
@@ -883,7 +883,7 @@ begin
                       -- Insert record
                       update dbo.TVFeed
                       set
-                      titleshort = @titleshort,
+                      titleshort = lower(@titleshort),
                       modified_date = cast(getdate() as datetime2(6))
                       where
                       titleshort = @titleshortold
