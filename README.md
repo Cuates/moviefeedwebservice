@@ -67,3 +67,18 @@
 
 ### Gunicorn Manual Execution
 * `/path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app`
+
+* Python project within an environment
+  * Create a directory where the project will live
+    * `sudo mkdir /path/to/project`
+  * Make sure you are a directory above the project you just created
+    * Create and activate virtual environment
+      * `cd /path/above/project/created`
+      * `python3.10 -m venv /path/to/project`
+      * `cd /path/to/project`
+      * `source bin/activate`
+  * Install all modules you will need for the project; This can be done individually or in a batch
+    * pip3.10 install -r /path/to/requirements.txt
+  * Deactivate virtual environment
+    * `deactivate`
+  * Code whatever project you are trying to accomplish
