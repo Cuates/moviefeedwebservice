@@ -75,8 +75,9 @@
     * Create and activate virtual environment
       * `cd /path/above/project/created`
       * `python3.10 -m venv /path/to/project`
-      * `cd /path/to/project`
-      * `source bin/activate`
+  * Activate environment
+    * `cd /path/to/project`
+    * `source bin/activate`
   * Install all modules you will need for the project; This can be done individually or in a batch
     * pip3.10 install -r /path/to/requirements.txt
   * Deactivate virtual environment
