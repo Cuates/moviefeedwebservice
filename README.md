@@ -72,7 +72,7 @@
   * Create a directory where the project will live
     * `sudo mkdir /path/to/project`
   * Make sure you are a directory above the project you just created
-    * Create and activate virtual environment
+    * Create virtual environment
       * `cd /path/above/project/created`
       * `python3.10 -m venv /path/to/project`
   * Activate environment
