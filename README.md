@@ -79,7 +79,7 @@
     * `cd /path/to/project`
     * `source bin/activate`
   * Install all modules you will need for the project; This can be done individually or in a batch
-    * pip3.10 install -r /path/to/requirements.txt
+    * `pip3.10 install -r /path/to/requirements.txt`
   * Deactivate virtual environment
     * `deactivate`
   * Code whatever project you are trying to accomplish
