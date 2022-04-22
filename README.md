@@ -85,27 +85,27 @@
   * Deactivate virtual environment
     * `deactivate`
   * Code whatever project you are trying to accomplish
-  * Login into the server as root user
-    * Create a file name "moviefeedwebservice.service" in the /etc/systemd/system/ directory
-      * Paste the following into the file
-        * <pre>
-            [Unit]
-            Description=movie feed web service service
-            After=network.target
+ * Login into the server as root user
+   * Create a file name "moviefeedwebservice.service" in the /etc/systemd/system/ directory
+     * Paste the following into the file
+       * <pre>
+           [Unit]
+           Description=movie feed web service service
+           After=network.target
 
-            [Service]
-            User=root
-            Group=root
-            WorkingDirectory=/var/www/html/moviefeedwebservice
-            ExecStart=/usr/local/bin/gunicorn --bind 127.0.0.1:4817 --workers=2 --threads=25 --chdir /var/www/html/moviefeedwebservice moviefeedwebservice:app
+           [Service]
+           User=root
+           Group=root
+           WorkingDirectory=/var/www/html/moviefeedwebservice
+           ExecStart=/usr/local/bin/gunicorn --bind 127.0.0.1:4817 --workers=2 --threads=25 --chdir /var/www/html/moviefeedwebservice moviefeedwebservice:app
 
-            [Install]
-            WantedBy=multi-user.target
-          </pre>
-      * Save and Exit
-    * Now you can start the script manually and check if the python API calls are working
-      * `sudo systemctl start moviefeedwebservice.service`
-    * Check the status of the script to make sure there are no issue when started
-      * `sudo systemctl status moviefeedwebservice.service`
-    * Enable at startup if everything is in good working order
-      * `sudo systemctl enable moviefeedwebservice.service`
+           [Install]
+           WantedBy=multi-user.target
+         </pre>
+     * Save and Exit
+   * Now you can start the script manually and check if the python API calls are working
+     * `sudo systemctl start moviefeedwebservice.service`
+   * Check the status of the script to make sure there are no issue when started
+     * `sudo systemctl status moviefeedwebservice.service`
+   * Enable at startup if everything is in good working order
+     * `sudo systemctl enable moviefeedwebservice.service`
