@@ -85,7 +85,7 @@
   * Deactivate virtual environment
     * `deactivate`
   * Code whatever project you are trying to accomplish
- * Login into the server as root user
+ * Login to the server as root user
    * Create a file name "moviefeedwebservice.service" in the /etc/systemd/system/ directory
      * Paste the following into the file
        * <pre>
