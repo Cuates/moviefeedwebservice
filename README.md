@@ -87,6 +87,7 @@
   * Code whatever project you are trying to accomplish
  * Login to the server as root user
    * Create a file name "moviefeedwebservice.service" in the following directory '/etc/systemd/system/'
+     * The path to your project will vary
      * Paste the following into the file
        * <pre>
            [Unit]
@@ -96,8 +97,8 @@
            [Service]
            User=root
            Group=root
-           WorkingDirectory=/var/www/html/moviefeedwebservice
-           ExecStart=/usr/local/bin/gunicorn --bind 127.0.0.1:4817 --workers=2 --threads=25 --chdir /var/www/html/moviefeedwebservice moviefeedwebservice:app
+           WorkingDirectory=/path/to/your/project
+           ExecStart=/usr/local/bin/gunicorn --bind 127.0.0.1:4817 --workers=2 --threads=25 --chdir /path/to/your/project moviefeedwebservice:app
 
            [Install]
            WantedBy=multi-user.target
