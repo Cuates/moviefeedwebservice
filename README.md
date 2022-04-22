@@ -6,6 +6,7 @@
 * [Important Note](#important-note)
 * [Prerequisite Python Modules](#prerequisite-python-modules)
 * [Gunicorn Manual Execution](#gunicorn-manual-execution)
+* [Python Script](#python-script)
 
 ### Version
 * 0.0.1
@@ -68,6 +69,7 @@
 ### Gunicorn Manual Execution
 * `/path/to/local/gunicorn --bind <ip_address>:<portnumber> --workers=2 --threads=25 --chdir /path/to/directory/moviefeedwebservice moviefeedwebservice:app`
 
+### Python Script
 * Python project within an environment
   * Create a directory where the project will live
     * `sudo mkdir /path/to/project`
