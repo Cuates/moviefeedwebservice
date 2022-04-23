@@ -8,3 +8,5 @@ virtualenv
 pytz
 tzlocal
 sqlalchemy
+mysqlclient
+feedparser
