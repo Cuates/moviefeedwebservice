@@ -4,7 +4,7 @@
 -- =================================================
 --        File: extractmediafeed
 --     Created: 11/10/2020
---     Updated: 11/17/2020
+--     Updated: 09/15/2023
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Extract media feed
@@ -17,6 +17,7 @@ drop function if exists extractmediafeed;
 create or replace function extractmediafeed(in optionMode text default null, in titlelong text default null, in titleshort text default null, in actionstatus text default null, in "limit" text default null, in sort text default null)
 returns table (titlelongreturn text,
   titleshortreturn text,
+  infourlreturn text,
   publishdatereturn text,
   actionstatusreturn text
 )
@@ -25,12 +26,14 @@ as $$
   declare omitOptionMode varchar(255) := '[^a-zA-Z]';
   declare omitTitleLong varchar(255) := '[^a-zA-Z0-9 !"\#$%&''()*+,\-./:;<=>?@\[\\\]^_‘{|}~¡¢£¥¦§¨©®¯°±´µ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿıŒœŠšŸŽžƒˆˇ˘˙˚˛ΓΘΣΦΩαδεπστφ–—‘’“”•…€™∂∆∏∑∙√∞∩∫≈≠≡≤≥]';
   declare omitTitleShort varchar(255) := '[^a-zA-Z0-9 !"\#$%&''()*+,\-./:;<=>?@\[\\\]^_‘{|}~¡¢£¥¦§¨©®¯°±´µ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿıŒœŠšŸŽžƒˆˇ˘˙˚˛ΓΘΣΦΩαδεπστφ–—‘’“”•…€™∂∆∏∑∙√∞∩∫≈≠≡≤≥]';
+  declare omitInfoUrl varchar(255) := '[^a-zA-Z0-9\-./%?=&]';
   declare omitActionStatus varchar(255) := '[^0-9]';
   declare omitLimit varchar(255) := '[^0-9\-]';
   declare omitSort varchar(255) := '[^a-zA-Z]';
   declare maxLengthOptionMode int := 255;
   declare maxLengthTitleLong int := 255;
   declare maxLengthTitleShort int := 255;
+  declare maxLengthInfoUrl int := 8000;
   declare maxLengthActionStatus int := 255;
   declare maxLengthSort int := 255;
   declare lowerLimit int := 1;
@@ -85,6 +88,21 @@ as $$
         titleshort := nullif(titleshort, '');
       end if;
     end if;
+	
+	-- -- Check if parameter is not null
+    -- if infourl is not null then
+      -- -- Omit characters, multi space to single space, and trim leading and trailing spaces
+      -- infourl := regexp_replace(regexp_replace(infourl, omitInfoUrl, ' '), '[ ]{2,}', ' ');
+
+      -- -- Set character limit
+      -- infourl := trim(substring(infourl, 1, maxLengthInfoUrl));
+
+      -- -- Check if empty string
+      -- if infourl = '' then
+        -- -- Set parameter to null if empty string
+        -- infourl := nullif(infourl, '');
+      -- end if;
+    -- end if;
 
     -- Check if parameter is not null
     if actionstatus is not null then
@@ -160,6 +178,7 @@ as $$
       'select
       cast(mf.titlelong as text),
       cast(mf.titleshort as text),
+	  cast(mf.info_url as text),
       cast(to_char(mf.publish_date, ''YYYY-MM-DD HH24:MI:SS.US'') as text),
       cast(mf.actionstatus as text)
       from moviefeed mf';
@@ -318,6 +337,7 @@ as $$
       'select
       cast(tvf.titlelong as text),
       cast(tvf.titleshort as text),
+	  cast(tvf.info_url as text),
       cast(to_char(tvf.publish_date, ''YYYY-MM-DD HH24:MI:SS.US'') as text),
       cast(tvf.actionstatus as text)
       from tvfeed tvf';
