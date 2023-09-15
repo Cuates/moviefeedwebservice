@@ -4,7 +4,7 @@ use <databasename>;
 -- =================================================
 --        File: extractmediafeed
 --     Created: 11/07/2020
---     Updated: 11/16/2020
+--     Updated: 09/15/2023
 --  Programmer: Cuates
 --   Update By: Cuates
 --     Purpose: Extract media feed
@@ -21,12 +21,14 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
     declare omitOptionMode nvarchar(255);
     declare omitTitleLong nvarchar(255);
     declare omitTitleShort nvarchar(255);
+    declare omitInfoUrl varchar(8000);
     declare omitActionStatus nvarchar(255);
     declare omitLimit nvarchar(255);
     declare omitSort nvarchar(255);
     declare maxLengthOptionMode int;
     declare maxLengthTitleLong int;
     declare maxLengthTitleShort int;
+    declare maxLengthInfoUrl int;
     declare maxLengthActionStatus int;
     declare maxLengthSort int;
     declare lowerLimit int;
@@ -50,12 +52,14 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
     set omitOptionMode = '[^a-zA-Z]';
     set omitTitleLong = '[^a-zA-Z0-9 !"\#$%&\'()*+,\-./:;<=>?@\[\\\]^_‘{|}~¡¢£¥¦§¨©®¯°±´µ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿıŒœŠšŸŽžƒˆˇ˘˙˚˛ΓΘΣΦΩαδεπστφ–—‘’“”•…€™∂∆∏∑∙√∞∩∫≈≠≡≤≥]';
     set omitTitleShort = '[^a-zA-Z0-9 !"\#$%&\'()*+,\-./:;<=>?@\[\\\]^_‘{|}~¡¢£¥¦§¨©®¯°±´µ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿıŒœŠšŸŽžƒˆˇ˘˙˚˛ΓΘΣΦΩαδεπστφ–—‘’“”•…€™∂∆∏∑∙√∞∩∫≈≠≡≤≥]';
+    set omitInfoUrl = '[^a-zA-Z0-9\-./%?=&]';
     set omitActionStatus = '[^0-9]';
     set omitLimit = '[^0-9\-]';
     set omitSort = '[^a-zA-Z]';
     set maxLengthOptionMode = 255;
     set maxLengthTitleLong = 255;
     set maxLengthTitleShort = 255;
+    set maxLengthInfoUrl = 8000;
     set maxLengthActionStatus = 255;
     set maxLengthSort = 255;
     set lowerLimit = 1;
@@ -114,6 +118,21 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
         set titleshort = nullif(titleshort, '');
       end if;
     end if;
+    
+	-- -- Check if parameter is not null
+    -- if infourl is not null then
+      -- -- Omit characters, multi space to single space, and trim leading and trailing spaces
+      -- set infourl = regexp_replace(regexp_replace(infourl, omitInfoUrl, ' '), '[ ]{2,}', ' ');
+
+      -- -- Set character limit
+      -- set infourl = trim(substring(infourl, 1, maxLengthInfoUrl));
+
+      -- -- Check if empty string
+      -- if infourl = '' then
+        -- -- Set parameter to null if empty string
+        -- set infourl = nullif(infourl, '');
+      -- end if;
+    -- end if;
 
     -- Check if parameter is not null
     if actionstatus is not null then
@@ -184,10 +203,11 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
       -- Utilize the parentheses for the top portion
       set @dSQL =
       'select
-      mf.titlelong as `Title Long`,
-      mf.titleshort as `Title Short`,
-      date_format(mf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `Publish Date`,
-      cast(mf.actionstatus as char) as `Action Status`
+      mf.titlelong as `titlelong`,
+      mf.titleshort as `titleshort`,
+      mf.info_url as `infourl`,
+      date_format(mf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `publishdate`,
+      cast(mf.actionstatus as char) as `actionstatus`
       from moviefeed mf';
 
       -- Check if where clause is given
@@ -308,10 +328,11 @@ create procedure `extractmediafeed`(in optionMode text, in titlelong text, in ti
       -- Utilize the parentheses for the top portion
       set @dSQL =
       'select
-      tvf.titlelong as `Title Long`,
-      tvf.titleshort as `Title Short`,
-      date_format(tvf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `Publish Date`,
-      cast(tvf.actionstatus as char) as `Action Status`
+      tvf.titlelong as `titlelong`,
+      tvf.titleshort as `titleshort`,
+      tvf.info_url as `infourl`,
+      date_format(tvf.publish_date, ''%Y-%m-%d %H:%i:%s.%f'') as `publishdate`,
+      cast(tvf.actionstatus as char) as `actionstatus`
       from tvfeed tvf';
 
       -- Check if where clause is given
