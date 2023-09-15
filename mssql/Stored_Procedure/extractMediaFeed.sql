@@ -68,7 +68,7 @@ begin
   set @omitOptionMode = N'0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
   set @omitTitleLong = N'-,.,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,[,],_,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
   set @omitTitleShort = N'-,.,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,[,],_,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
-  set @omitInfoUrl = N'-,.,/,%,?,=,&,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,[,],_,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
+  set @omitInfoUrl = N'-,.,/,%,?,=,&,:,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,[,],_,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
   set @omitActionStatus = N'0,1,2,3,4,5,6,7,8,9'
   set @omitLimit = N'-,0,1,2,3,4,5,6,7,8,9'
   set @omitSort = N'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
@@ -133,22 +133,22 @@ begin
         end
     end
 
-  -- Check if parameter is not null
-  if @infourl is not null
-    begin
-      -- Omit characters
-      set @infourl = dbo.OmitCharacters(@infourl, @omitInfoUrl)
+  ---- Check if parameter is not null
+  --if @infourl is not null
+  --  begin
+  --    -- Omit characters
+  --    set @infourl = dbo.OmitCharacters(@infourl, @omitInfoUrl)
 
-      -- Set character limit
-      set @infourl = trim(substring(@infourl, 1, @maxLengthInfoUrl))
+  --    -- Set character limit
+  --    set @infourl = trim(substring(@infourl, 1, @maxLengthInfoUrl))
 
-      -- Check if empty string
-      if @infourl = ''
-        begin
-          -- Set parameter to null if empty string
-          set @infourl = nullif(@infourl, '')
-        end
-    end
+  --    -- Check if empty string
+  --    if @infourl = ''
+  --      begin
+  --        -- Set parameter to null if empty string
+  --        set @infourl = nullif(@infourl, '')
+  --      end
+  --  end
 
   -- Check if parameter is not null
   if @actionstatus is not null
